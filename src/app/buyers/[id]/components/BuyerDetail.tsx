@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { Buyer, BuyerHistory } from '@/lib/schema';
 import BuyerForm from '../../components/BuyerForm';
-import { updateBuyer, deleteBuyer } from '@/lib/queries';
-import { updateBuyerSchema } from '@/lib/validations';
+import { deleteBuyer } from '@/lib/queries';
 import { useRouter } from 'next/navigation';
 import { Trash2, Edit, ArrowLeft } from 'lucide-react';
 
@@ -13,53 +12,13 @@ interface BuyerDetailProps {
   canEdit: boolean;
   history: BuyerHistory[];
   currentUserId: string;
+  onUpdate: (formData: FormData) => Promise<void>;
 }
 
-export default function BuyerDetail({ buyer, canEdit, history, currentUserId }: BuyerDetailProps) {
+export default function BuyerDetail({ buyer, canEdit, history, currentUserId, onUpdate }: BuyerDetailProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
-
-  const handleUpdate = async (formData: FormData) => {
-    'use server';
-    
-    const rawData = {
-      id: formData.get('id') as string,
-      updatedAt: parseInt(formData.get('updatedAt') as string),
-      fullName: formData.get('fullName') as string,
-      email: formData.get('email') as string,
-      phone: formData.get('phone') as string,
-      city: formData.get('city') as string,
-      propertyType: formData.get('propertyType') as string,
-      bhk: formData.get('bhk') as string,
-      purpose: formData.get('purpose') as string,
-      budgetMin: formData.get('budgetMin') ? parseInt(formData.get('budgetMin') as string) : undefined,
-      budgetMax: formData.get('budgetMax') ? parseInt(formData.get('budgetMax') as string) : undefined,
-      timeline: formData.get('timeline') as string,
-      source: formData.get('source') as string,
-      notes: formData.get('notes') as string,
-      tags: formData.get('tags') ? (formData.get('tags') as string).split(',').map(t => t.trim()).filter(Boolean) : undefined,
-    };
-
-    try {
-      const validatedData = updateBuyerSchema.parse(rawData);
-      
-      await updateBuyer(
-        validatedData.id,
-        {
-          ...validatedData,
-          tags: validatedData.tags ? JSON.stringify(validatedData.tags) : null,
-        },
-        currentUserId,
-        validatedData.updatedAt
-      );
-      
-      router.push('/buyers');
-    } catch (error) {
-      console.error('Update error:', error);
-      alert('Failed to update buyer. Please try again.');
-    }
-  };
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this buyer lead? This action cannot be undone.')) {
@@ -111,7 +70,7 @@ export default function BuyerDetail({ buyer, canEdit, history, currentUserId }: 
             Back to view
           </button>
         </div>
-        <BuyerForm action={handleUpdate} buyer={buyer} isEdit={true} />
+        <BuyerForm action={onUpdate} buyer={buyer} isEdit={true} />
       </div>
     );
   }

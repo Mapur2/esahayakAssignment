@@ -16,21 +16,22 @@ interface SearchParams {
 export default async function BuyersPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   const user = await requireAuth();
+  const params = await searchParams;
   
-  const page = parseInt(searchParams.page || '1');
+  const page = parseInt(params.page || '1');
   const filters = {
-    city: searchParams.city,
-    propertyType: searchParams.propertyType,
-    status: searchParams.status,
-    timeline: searchParams.timeline,
-    search: searchParams.search,
+    city: params.city,
+    propertyType: params.propertyType,
+    status: params.status,
+    timeline: params.timeline,
+    search: params.search,
   };
   
-  const sort = searchParams.sort 
-    ? { field: searchParams.sort.split('-')[0] as 'updatedAt' | 'fullName', direction: searchParams.sort.split('-')[1] as 'asc' | 'desc' }
+  const sort = params.sort 
+    ? { field: params.sort.split('-')[0] as 'updatedAt' | 'fullName', direction: params.sort.split('-')[1] as 'asc' | 'desc' }
     : { field: 'updatedAt' as const, direction: 'desc' as const };
 
   const { buyers, total } = await getBuyers(page, 10, filters, sort);

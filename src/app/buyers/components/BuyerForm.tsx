@@ -22,8 +22,10 @@ export default function BuyerForm({ action, buyer, isEdit = false }: BuyerFormPr
   return (
     <form action={action} className="space-y-6">
       {isEdit && buyer && (
-        <input type="hidden" name="id" value={buyer.id} />
-        <input type="hidden" name="updatedAt" value={buyer.updatedAt.getTime()} />
+        <>
+          <input type="hidden" name="id" value={buyer.id} />
+          <input type="hidden" name="updatedAt" value={buyer.updatedAt.getTime()} />
+        </>
       )}
 
       <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
@@ -225,7 +227,7 @@ export default function BuyerForm({ action, buyer, isEdit = false }: BuyerFormPr
                 <option value="">Select timeline</option>
                 <option value="0-3m">0-3 months</option>
                 <option value="3-6m">3-6 months</option>
-                <option value=">6m">>6 months</option>
+                <option value=">6m">&gt;6 months</option>
                 <option value="Exploring">Exploring</option>
               </select>
             </div>
